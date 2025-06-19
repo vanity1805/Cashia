@@ -1,131 +1,123 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Entypo from 'react-native-vector-icons/Entypo';
+import Feather from 'react-native-vector-icons/Feather';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+// Screens
+import Home from './Screens/Home';
+import Form from './Screens/Form';
+import About from './Screens/About';
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const HomeStack = createNativeStackNavigator();
+const FormStack = createNativeStackNavigator();
+const AboutStack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+// Home Stack
+function HomeStackScreen() {
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+    <HomeStack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#000', },
+        headerTintColor: '#fff',
+        contentStyle: { backgroundColor: '#FFFEF2' },
+      }}
+    >
+      <HomeStack.Screen name="HomeMain" component={Home} options={{ title: 'cashia', 
+        headerTitleStyle: {
+          fontFamily: 'Cocogoose-Pro-Bold-trial', // Must match the font name you've loaded
+          fontSize: 24,
+        },
+      }} />
+    </HomeStack.Navigator>
   );
 }
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  /*
-   * To keep the template simple and small we're adding padding to prevent view
-   * from rendering under the System UI.
-   * For bigger apps the recommendation is to use `react-native-safe-area-context`:
-   * https://github.com/AppAndFlow/react-native-safe-area-context
-   *
-   * You can read more about it here:
-   * https://github.com/react-native-community/discussions-and-proposals/discussions/827
-   */
-  const safePadding = '5%';
-
+// Form Stack
+function FormStackScreen() {
   return (
-    <View style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        style={backgroundStyle}>
-        <View style={{paddingRight: safePadding}}>
-          <Header/>
-        </View>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            paddingHorizontal: safePadding,
-            paddingBottom: safePadding,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </View>
+    <FormStack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#000' },
+        headerTintColor: '#fff',
+        contentStyle: { backgroundColor: '#FFFEF2' },
+      }}>
+      <FormStack.Screen name="FormMain" component={Form} options={{ title: 'Form', 
+      headerTitleStyle: {
+          fontFamily: 'Cocogoose-Pro-Bold-trial', // Must match the font name you've loaded
+          fontSize: 24,
+        },
+      }} />
+    </FormStack.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+// About Stack
+function AboutStackScreen() {
+  return (
+    <AboutStack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#000' },
+        headerTintColor: '#fff',
+        contentStyle: { backgroundColor: '#FFFEF2' },
+      }}>
+      <AboutStack.Screen name="AboutMain" component={About} options={{ title: 'About',
+        headerTitleStyle: {
+          fontFamily: 'Cocogoose-Pro-Bold-trial', // Must match the font name you've loaded
+          fontSize: 24,
+        },
+      }} />
+    </AboutStack.Navigator>
+  );
+}
 
-export default App;
+export default function App() {
+  return (
+      <NavigationContainer>
+        <Tab.Navigator
+          screenOptions={({ route }) => ({
+            tabBarIcon: ({ color, size }) => {
+              if (route.name === 'Home') {
+                return <Feather name="home" size={size} color={color} />;
+              } else if (route.name === 'Form') {
+                return <AntDesign name="pluscircleo" size={size} color={color} />;
+              } else if (route.name === 'About') {
+                return <Feather name="info" size={size} color={color} />;
+              } else {
+                return <AntDesign name="question" size={size} color={color} />;
+              }
+            },
+            headerShown: false,
+            tabBarStyle: {backgroundColor: '#000', 
+                          elevation: 4,
+                          borderTopWidth: 0,
+                          height: 60,
+                          paddingBottom: 10, 
+                          paddingTop: 5,
+                          },
+            tabBarActiveTintColor: '#fff',
+            tabBarInactiveTintColor: '#216C53',
+          })}
+        >
+          <Tab.Screen name="Home" component={HomeStackScreen} />
+          <Tab.Screen name="Form" component={FormStackScreen} options={{
+            tabBarLabel: () => null, // hide label for Home only
+            tabBarIcon: ({ color }) => (
+                <AntDesign name="pluscircleo" size={28} color={color} />
+            ),  
+              tabBarItemStyle: {
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingVertical: 5, // Optional: gives more spacing inside
+            },
+          }} />
+
+          <Tab.Screen name="About" component={AboutStackScreen} />
+        </Tab.Navigator>
+      </NavigationContainer>
+  );
+}

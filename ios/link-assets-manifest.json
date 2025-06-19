@@ -1,0 +1,13 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "Assets/Fonts/Cocogoose-Pro-Bold-trial.ttf",
+      "sha1": "ec341d1001e61c456dfbb3546ef0b2eebed53615"
+    },
+    {
+      "path": "Assets/Fonts/Cocogoose-Pro-Regular-trial.ttf",
+      "sha1": "c88bbd17cea8e68671cf3c9b98b215b11bf5e100"
+    }
+  ]
+}
