@@ -123,7 +123,7 @@ const Form = () => {
             </TouchableOpacity>
           </Animated.View>
 
-          {/* First input-button group in a container */}
+          {/* Second input-button group in a container */}
           <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }] }]}>
             <TextInput
               style={styles.input}
@@ -168,7 +168,7 @@ const Form = () => {
             </TouchableOpacity>
           </Animated.View>
 
-          {/* Second input-button group in a container */}
+          {/* Third input-button group in a container */}
           <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }] }]}>
             <TextInput
               style={styles.input}
