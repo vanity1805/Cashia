@@ -113,6 +113,20 @@ const Form = () => {
           <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }] }]}>
             <TextInput
               style={styles.input}
+              placeholder="Enter budget"
+              placeholderTextColor="#9c9ba0"
+              value={foodChoice}
+              onChangeText={setFoodChoice}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleFoodPress}>
+              <Text style={styles.buttonText}>Submit</Text>
+            </TouchableOpacity>
+          </Animated.View>
+
+          {/* First input-button group in a container */}
+          <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }] }]}>
+            <TextInput
+              style={styles.input}
               placeholder="Enter food choices"
               placeholderTextColor="#9c9ba0"
               value={foodChoice}
