@@ -14,6 +14,8 @@ import {
 import { Picker } from '@react-native-picker/picker';
 
 const Form = () => {
+
+  //Set the states
   const scrollY = useRef(new Animated.Value(0)).current;
   const [foodChoice, setFoodChoice] = React.useState('');
   const [foodPrice, setFoodPrice] = React.useState('');
@@ -24,58 +26,71 @@ const Form = () => {
   const [foodDataList, setFoodDataList] = React.useState<{ food: string; rating: number; price: number }[]>([]);
   const [transportDataList, setTransportDataList] = React.useState<{ transport: string; rating: number; price: number }[]>([]);
 
+  //For handling event of food
   const handleFoodPress = () => {
 
+    //Validation to check if all fields are filled
     if (!foodChoice || !selectedOption || !foodPrice) {
     Alert.alert('Error', 'Please fill in all food fields before submitting!');
     return;
     }
 
+    //to insert a new food entry
     const newEntry = {
     food: foodChoice || 'N/A',
     rating: parseInt(selectedOption) || 0,
     price: parseInt(foodPrice) || 0,
     };
 
+    //Update the list of foods
     setFoodDataList(prevList => {
       const updatedList = [...prevList, newEntry];
       console.log('Food Data List:', updatedList);
       return updatedList;
     });
 
+    //To reset the fields
     setFoodChoice('');
     setFoodPrice('');
     setSelectedOption('');
 
+    //Echo back the data that the user entered
     Alert.alert('Food Entry', `Food: ${foodChoice || 'N/A'}\nRating: ${selectedOption || 'N/A'}\nPrice: ${foodPrice || 'N/A'}`);
   };
 
+  //For handling event of transport
   const handleTransportPress = () => {
 
+    //To check if all transport field
     if (!transportChoice || !selectedOption1 || !transportPrice) {
     Alert.alert('Error', 'Please fill in all transport fields before submitting!');
     return;
     }
 
+    //To insert a new transport entry
     const newEntry = {
     transport: transportChoice || 'N/A',
     rating: parseInt(selectedOption1) || 0,
     price: parseInt(transportPrice) || 0,
     };
 
+    //Update the transport list 
     setTransportDataList(prevList => {
       const updatedList = [...prevList, newEntry];
       console.log('Transport Data List:', updatedList);
       return updatedList;
     });
 
+    //Reset the transport fields
     setTransportChoice('');
     setTransportPrice('');
     setSelectedOption1('');
 
+    //Echo back the transport data that the user entered
     Alert.alert('Transportation Entry', `Transportation: ${transportChoice || 'N/A'}\nRating: ${selectedOption1 || 'N/A'}\nPrice: ${transportPrice || 'N/A'}`);
   };
 
+  //Resize form when scrolling
   const scaleAnim = scrollY.interpolate({
   inputRange: [0, 150],
   outputRange: [1, 0.95], // Normal to slightly smaller
@@ -111,7 +126,7 @@ const Form = () => {
                 onValueChange={(itemValue) => setSelectedOption(itemValue)}
                 style={styles.picker}
               >
-                <Picker.Item label="Nutritional Rating" value="" color="#FFF" />
+                <Picker.Item label="Satisfaction Rating" value="" color="#FFF" />
                 <Picker.Item label="10" value="10"color="#FFF" />
                 <Picker.Item label="9" value="9" color="#FFF" />
                 <Picker.Item label="8" value="8" color="#FFF" />
