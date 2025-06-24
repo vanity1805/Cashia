@@ -23,8 +23,10 @@ const Form = () => {
   const [transportPrice, setTransportPrice] = React.useState('');
   const [selectedOption, setSelectedOption] = React.useState('');
   const [selectedOption1, setSelectedOption1] = React.useState('');
+  const [budget, setBudget] = React.useState('');
   const [foodDataList, setFoodDataList] = React.useState<{ food: string; rating: number; price: number }[]>([]);
   const [transportDataList, setTransportDataList] = React.useState<{ transport: string; rating: number; price: number }[]>([]);
+  const [budgetList, setBudgetList] = React.useState<{ budget: number }[]>([]);
 
   //For handling event of food
   const handleFoodPress = () => {
@@ -90,6 +92,29 @@ const Form = () => {
     Alert.alert('Transportation Entry', `Transportation: ${transportChoice || 'N/A'}\nRating: ${selectedOption1 || 'N/A'}\nPrice: ${transportPrice || 'N/A'}`);
   };
 
+  //For handling event of budget button
+  const handleBudgetPress = () => {
+  if (!budget) {
+    Alert.alert('Error', 'Please enter a budget before submitting!');
+    return;
+  }
+
+  const newEntry = {
+    budget: parseFloat(budget),
+  };
+
+  setBudgetList(prevList => {
+    const updatedList = [...prevList, newEntry];
+    console.log('Budget List:', updatedList);
+    return updatedList;
+  });
+
+  // Reset the input field
+  setBudget('');
+
+  Alert.alert('Budget Entry', `Budget: ${budget}`);
+};
+
   //Resize form when scrolling
   const scaleAnim = scrollY.interpolate({
   inputRange: [0, 150],
@@ -115,10 +140,11 @@ const Form = () => {
               style={styles.input}
               placeholder="Enter budget"
               placeholderTextColor="#9c9ba0"
-              value={foodChoice}
-              onChangeText={setFoodChoice}
+              value={budget}
+              onChangeText={setBudget}
+              keyboardType="numeric"
             />
-            <TouchableOpacity style={styles.button} onPress={handleFoodPress}>
+            <TouchableOpacity style={styles.button} onPress={handleBudgetPress}>
               <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
           </Animated.View>
@@ -211,6 +237,12 @@ const Form = () => {
               <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
           </Animated.View>
+
+          {/* Output button */}
+            <TouchableOpacity style={styles.outputButton} onPress={handleFoodPress}> 
+              <Text style={styles.buttonText}>OUTPUT</Text>
+            </TouchableOpacity>
+
         </View>
       </Animated.ScrollView>
     </SafeAreaView>
@@ -283,6 +315,23 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  outputButton: {
+    backgroundColor: '#33866A',
+    borderWidth: 0,
+    borderColor: '#33866A',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    alignSelf: 'center',
+    width: '50%',
+    alignItems: 'center',
+    marginTop: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 4,
   },
   dropdownContainer: {
     borderWidth: 0,
