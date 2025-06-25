@@ -10,11 +10,11 @@ import Feather from 'react-native-vector-icons/Feather';
 // Screens
 import Home from './Screens/Home';
 import Form from './Screens/Form';
-import About from './Screens/About';
+import Items from './Screens/Items';
 
 const HomeStack = createNativeStackNavigator();
 const FormStack = createNativeStackNavigator();
-const AboutStack = createNativeStackNavigator();
+const ItemsStack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Home Stack
@@ -57,21 +57,21 @@ function FormStackScreen() {
 }
 
 // About Stack
-function AboutStackScreen() {
+function ItemsStackScreen() {
   return (
-    <AboutStack.Navigator
+    <ItemsStack.Navigator
       screenOptions={{
         headerStyle: { backgroundColor: '#000' },
         headerTintColor: '#fff',
         contentStyle: { backgroundColor: '#FFFEF2' },
       }}>
-      <AboutStack.Screen name="AboutMain" component={About} options={{ title: 'About',
+      <ItemsStack.Screen name="ItemsMain" component={Items} options={{ title: 'Items',
         headerTitleStyle: {
           fontFamily: 'Cocogoose-Pro-Bold-trial', // Must match the font name you've loaded
           fontSize: 24,
         },
       }} />
-    </AboutStack.Navigator>
+    </ItemsStack.Navigator>
   );
 }
 
@@ -85,8 +85,8 @@ export default function App() {
                 return <Feather name="home" size={size} color={color} />;
               } else if (route.name === 'Form') {
                 return <AntDesign name="pluscircleo" size={size} color={color} />;
-              } else if (route.name === 'About') {
-                return <Feather name="info" size={size} color={color} />;
+              } else if (route.name === 'Items') {
+                return <Feather name="list" size={size} color={color} />;
               } else {
                 return <AntDesign name="question" size={size} color={color} />;
               }
@@ -116,7 +116,7 @@ export default function App() {
             },
           }} />
 
-          <Tab.Screen name="About" component={AboutStackScreen} />
+          <Tab.Screen name="Items" component={ItemsStackScreen} />
         </Tab.Navigator>
       </NavigationContainer>
   );

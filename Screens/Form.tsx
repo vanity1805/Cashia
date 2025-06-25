@@ -145,6 +145,7 @@ const Form = () => {
     setShowOutput(true);
   };
 
+  //Knapsack 0/1 Algorithm Dynamic Programming Approach
   const knapsack = (items: { food: string; rating: number; price: number }[], capacity: number) => {
     const n = items.length;
     const dp = Array.from({ length: n + 1 }, () => Array(capacity + 1).fill(0));
