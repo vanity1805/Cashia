@@ -6,6 +6,8 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
 
+import { AppProvider } from './AppContext';
+
 
 // Screens
 import Home from './Screens/Home';
@@ -77,6 +79,7 @@ function ItemsStackScreen() {
 
 export default function App() {
   return (
+    <AppProvider>
       <NavigationContainer>
         <Tab.Navigator
           screenOptions={({ route }) => ({
@@ -119,5 +122,6 @@ export default function App() {
           <Tab.Screen name="Items" component={ItemsStackScreen} />
         </Tab.Navigator>
       </NavigationContainer>
+    </AppProvider>
   );
 }

@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { useAppContext } from '../AppContext';
 
 const Items = () => {
-  // Sample data matching your Form component structure
-  const [budgetList] = useState([{ budget: 500.00 }]);
-  const [transportList] = useState([{ transportCost: 25.50 }]);
   
-  const [foodDataList] = useState([
-    { food: 'Rice (5kg)', rating: 9, price: 45 },
-    { food: 'Chicken Breast (1kg)', rating: 8, price: 180 },
-    { food: 'Vegetables Mix', rating: 7, price: 120 },
-    { food: 'Bread (Loaf)', rating: 6, price: 35 },
-    { food: 'Milk (1L)', rating: 8, price: 65 },
-    { food: 'Eggs (12pcs)', rating: 9, price: 85 },
-    { food: 'Cooking Oil (1L)', rating: 5, price: 75 },
-    { food: 'Fruits Assorted', rating: 7, price: 95 }
-  ]);
+  //The shared states
+    const {
+      foodDataList,
+      setFoodDataList,
+      transportList,
+      setTransportList,
+      budgetList,
+      setBudgetList,
+    } = useAppContext();
 
   // Calculate budget values
   const budget = budgetList[0]?.budget || 0;

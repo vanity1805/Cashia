@@ -17,4 +17,33 @@ type AppContextType = {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+//Provider
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [foodDataList, setFoodDataList] = useState<Food[]>([]);
+  const [transportList, setTransportList] = useState<Transport[]>([]);
+  const [budgetList, setBudgetList] = useState<Budget[]>([]);
 
+  return (
+    <AppContext.Provider
+      value={{
+        foodDataList,
+        setFoodDataList,
+        transportList,
+        setTransportList,
+        budgetList,
+        setBudgetList,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
+};
+
+// Custom hook for usage
+export const useAppContext = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useAppContext must be used within an AppProvider');
+  }
+  return context;
+};

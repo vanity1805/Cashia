@@ -11,10 +11,21 @@ import {
   Animated,
   Modal,
 } from 'react-native';
+import { useAppContext } from '../AppContext';
 
 import { Picker } from '@react-native-picker/picker';
 
 const Form = () => {
+
+  //The shared states
+  const {
+    foodDataList,
+    setFoodDataList,
+    transportList,
+    setTransportList,
+    budgetList,
+    setBudgetList,
+  } = useAppContext();
 
   //Set the states
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -24,9 +35,6 @@ const Form = () => {
   const [selectedOption, setSelectedOption] = React.useState('');
   const [selectedOption1, setSelectedOption1] = React.useState('');
   const [budget, setBudget] = React.useState('');
-  const [foodDataList, setFoodDataList] = React.useState<{ food: string; rating: number; price: number }[]>([]);
-  const [transportList, setTransportList] = React.useState<{ transportCost: number }[]>([]);
-  const [budgetList, setBudgetList] = React.useState<{ budget: number }[]>([]);
   const [showOutput, setShowOutput] = React.useState(false);
   const [recommendedItems, setRecommendedItems] = React.useState<
   { food: string; rating: number; price: number }[]>([]);
