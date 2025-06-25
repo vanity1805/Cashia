@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Modal } from 'react-native';
 import { useAppContext } from '../AppContext';
 
 const Items = () => {
+
+  const [totalPrice, setTotalPrice] = React.useState(0);
+  const [totalRating, setTotalRating] = React.useState(0);
+  const [showOutput, setShowOutput] = React.useState(false);
+  const [recommendedItems, setRecommendedItems] = React.useState<
+    { food: string; rating: number; price: number }[]>([]);
   
   //The shared states
     const {
@@ -18,11 +24,6 @@ const Items = () => {
   const budget = budgetList[0]?.budget || 0;
   const transportCost = transportList[0]?.transportCost || 0;
   const availableBudget = budget - transportCost;
-  
-  // Calculate totals for food items
-  const totalFoodCost = foodDataList.reduce((sum, item) => sum + item.price, 0);
-  const totalRating = foodDataList.reduce((sum, item) => sum + item.rating, 0);
-  const averageRating = foodDataList.length > 0 ? (totalRating / foodDataList.length).toFixed(1) : 0;
 
   const renderStars = (rating: number) => {
     const maxStars = 10;
@@ -39,8 +40,10 @@ const Items = () => {
     return stars.join('');
   };
 
+  //Render the items in items section
   const renderFoodItem = (item: { food: string; rating: number; price: number }, index: number) => (
     <View key={index} style={styles.foodItem}>
+
       <View style={styles.foodInfo}>
         <Text style={styles.foodName}>{item.food}</Text>
         <View style={styles.ratingContainer}>
@@ -48,9 +51,99 @@ const Items = () => {
           <Text style={styles.ratingText}>({item.rating}/10)</Text>
         </View>
       </View>
-      <Text style={styles.foodPrice}>₱{item.price}</Text>
+
+      <View style={styles.foodActions}>
+        <Text style={styles.foodPrice}>₱{item.price}</Text>
+        <TouchableOpacity 
+          style={styles.removeButton}
+          onPress={() => handleRemoveItem(index)}
+        >
+          <Text style={styles.removeButtonText}>×</Text>
+        </TouchableOpacity>
+      </View>
+
     </View>
   );
+
+  // Handle remove item
+  const handleRemoveItem = (index: number) => {
+    Alert.alert(
+      'Remove Item',
+      'Are you sure you want to remove this item?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: () => {
+            const updatedFoodList = foodDataList.filter((_, i) => i !== index);
+            setFoodDataList(updatedFoodList);
+          },
+        },
+      ]
+    );
+  };
+
+  // Handle output button press
+    const handleOutputPress = () => {
+      if (foodDataList.length === 0 && transportList.length === 0 && budgetList.length === 0) {
+        Alert.alert('No Data', 'Please enter food, transport, and budget data before viewing output!');
+        return;
+      }
+  
+      const budgetValue = budgetList[0].budget;
+      const transportValue = transportList[0].transportCost;
+      const availableBudget = budgetValue - transportValue;
+  
+      if(availableBudget <= 0){
+        Alert.alert('Insufficient Budget', 'Transport cost is equal or exceeds the budget');
+        return;
+      }
+  
+      const result = knapsack(foodDataList, availableBudget);
+      setRecommendedItems(result);
+  
+      //compute for the totals
+      const totalPrice = result.reduce((sum, item) => sum + item.price, 0);
+      const totalRating = result.reduce((sum, item) => sum + item.rating, 0);
+      setTotalPrice(totalPrice);
+      setTotalRating(totalRating);
+  
+      setShowOutput(true);
+    };
+  
+    //Knapsack 0/1 Algorithm Dynamic Programming Approach
+    const knapsack = (items: { food: string; rating: number; price: number }[], capacity: number) => {
+      const n = items.length;
+      const dp = Array.from({ length: n + 1 }, () => Array(capacity + 1).fill(0));
+      
+      // Build DP table
+      for (let i = 1; i <= n; i++) {
+        const { rating, price } = items[i - 1];
+        for (let w = 0; w <= capacity; w++) {
+          if (price <= w) {
+            dp[i][w] = Math.max(rating + dp[i - 1][w - price], dp[i - 1][w]);
+          } else {
+            dp[i][w] = dp[i - 1][w];
+          }
+        }
+      }
+  
+      // Backtrack to find selected items
+      let w = capacity;
+      const selected: typeof items = [];
+      for (let i = n; i > 0; i--) {
+        if (dp[i][w] !== dp[i - 1][w]) {
+          selected.push(items[i - 1]);
+          w -= items[i - 1].price;
+        }
+      }
+  
+      return selected.reverse(); // Return in input order
+    };
 
   return (
     <ScrollView style={styles.container}>
@@ -74,100 +167,102 @@ const Items = () => {
             <Text style={styles.budgetLabel}>Budget Available for Food:</Text>
             <Text style={styles.availableAmount}>₱{availableBudget.toFixed(2)}</Text>
           </View>
-          <View style={[styles.budgetRow, styles.totalRow]}>
-            <Text style={styles.totalLabel}>Total Food Cost:</Text>
-            <Text style={[
-              styles.totalAmount, 
-              totalFoodCost > availableBudget ? styles.overBudget : styles.underBudget
-            ]}>
-              ₱{totalFoodCost.toFixed(2)}
-            </Text>
-          </View>
         </View>
       </View>
 
       {/* Food Items List */}
       <View style={styles.foodSection}>
-        <Text style={styles.sectionTitle}>Food Items ({foodDataList.length})</Text>
-        <View style={styles.foodList}>
-          {foodDataList.map(renderFoodItem)}
-        </View>
-      </View>
-
-      {/* Summary Statistics */}
-      <View style={styles.summarySection}>
-        <Text style={styles.sectionTitle}>Summary</Text>
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Total Items:</Text>
-            <Text style={styles.summaryValue}>{foodDataList.length}</Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Average Rating:</Text>
-            <Text style={styles.summaryValue}>{averageRating}/10</Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Total Rating Points:</Text>
-            <Text style={styles.summaryValue}>{totalRating}</Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Budget Status:</Text>
-            <Text style={[
-              styles.summaryValue,
-              totalFoodCost <= availableBudget ? styles.statusGood : styles.statusBad
-            ]}>
-              {totalFoodCost <= availableBudget ? 'Within Budget' : 'Over Budget'}
-            </Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Budget Breakdown
-      <View style={styles.breakdownSection}>
-        <Text style={styles.sectionTitle}>Budget Breakdown</Text>
-        <View style={styles.breakdownCard}>
-          <View style={styles.breakdownItem}>
-            <View style={styles.breakdownBar}>
-              <View style={[
-                styles.breakdownFill,
-                { 
-                  width: `${(transportCost / budget) * 100}%`,
-                  backgroundColor: '#ff6b6b'
-                }
-              ]} />
-            </View>
-            <Text style={styles.breakdownLabel}>Transport: ₱{transportCost}</Text>
-          </View>
-          
-          <View style={styles.breakdownItem}>
-            <View style={styles.breakdownBar}>
-              <View style={[
-                styles.breakdownFill,
-                { 
-                  width: `${Math.min((totalFoodCost / budget) * 100, 100)}%`,
-                  backgroundColor: totalFoodCost <= availableBudget ? '#4CAF50' : '#ff4444'
-                }
-              ]} />
-            </View>
-            <Text style={styles.breakdownLabel}>Food: ₱{totalFoodCost}</Text>
-          </View>
-          
-          {budget - transportCost - totalFoodCost > 0 && (
-            <View style={styles.breakdownItem}>
-              <View style={styles.breakdownBar}>
-                <View style={[
-                  styles.breakdownFill,
-                  { 
-                    width: `${((budget - transportCost - totalFoodCost) / budget) * 100}%`,
-                    backgroundColor: '#666'
-                  }
-                ]} />
-              </View>
-              <Text style={styles.breakdownLabel}>Remaining: ₱{(budget - transportCost - totalFoodCost).toFixed(2)}</Text>
-            </View>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Food Items ({foodDataList.length})</Text>
+          {foodDataList.length > 0 && (
+            <TouchableOpacity 
+              style={styles.clearAllButton}
+              onPress={() => {
+                Alert.alert(
+                  'Clear All Items',
+                  'Are you sure you want to remove all food items?',
+                  [
+                    {
+                      text: 'Cancel',
+                      style: 'cancel',
+                    },
+                    {
+                      text: 'Clear All',
+                      style: 'destructive',
+                      onPress: () => {
+                        setFoodDataList([]);
+                      },
+                    },
+                  ]
+                );
+              }}
+            >
+              <Text style={styles.clearAllText}>Clear All</Text>
+            </TouchableOpacity>
           )}
         </View>
-      </View> */}
+        
+        {foodDataList.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>No food items added yet</Text>
+          </View>
+        ) : (
+          <View style={styles.foodList}>
+            {foodDataList.map(renderFoodItem)}
+          </View>
+        )}
+      </View>
+
+      {/* Output button */}
+      <TouchableOpacity style={styles.outputButton} onPress={handleOutputPress}> 
+        <Text style={styles.buttonText}>OUTPUT</Text>
+      </TouchableOpacity>
+
+      {/* Modal for the Output */}
+      <Modal
+        animationType='slide'
+        transparent={true}
+        visible={showOutput}
+        onRequestClose={() => setShowOutput(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+
+            <ScrollView style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Recommended Purchases:</Text>
+
+              {recommendedItems.length === 0 ? (
+                <Text style={{ color: '#fff', textAlign: 'center' }}>No combination found.</Text>
+              ) : (
+                <>
+                  {recommendedItems.map((item, index) => (
+                    <Text key={index} style={{ color: '#fff', marginBottom: 10 }}>
+                      {item.food} - Rating: {item.rating}, Price: {item.price}
+                    </Text>
+                  ))}
+                  <View style={{ marginTop: 20 }}>
+                    <Text style={{ color: '#fff', fontWeight: 'bold', textAlign: 'center' }}>
+                      Total Price: {totalPrice}
+                    </Text>
+                    <Text style={{ color: '#fff', fontWeight: 'bold', textAlign: 'center' }}>
+                      Total Rating: {totalRating}
+                    </Text>
+                  </View>
+                </>
+              )}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setShowOutput(false)}
+            >
+              <Text style={styles.buttonText}>Close</Text>
+            </TouchableOpacity>
+
+          </View>
+        </View>
+      </Modal>
+      
     </ScrollView>
   );
 };
@@ -377,6 +472,116 @@ const styles = StyleSheet.create({
   breakdownLabel: {
     fontSize: 14,
     color: '#fff',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  outputButton: {
+    backgroundColor: '#33866A',
+    borderWidth: 0,
+    borderColor: '#33866A',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    alignSelf: 'center',
+    width: '50%',
+    alignItems: 'center',
+    marginTop: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  //Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: '#216C53',
+    borderRadius: 25,
+    margin: 20,
+    maxHeight: '80%',
+    width: '90%',
+  },
+  modalContent: {
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  closeButton: {
+    backgroundColor: '#33866A',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    alignSelf: 'center',
+    width: '50%',
+    alignItems: 'center',
+    margin: 20,
+  },
+
+  //For the delete of food items
+  foodActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  removeButton: {
+    backgroundColor: '#ff4444',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  removeButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    lineHeight: 20,
+  },
+   sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  clearAllButton: {
+    backgroundColor: '#ff4444',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 15,
+  },
+  clearAllText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  emptyState: {
+    backgroundColor: '#33866A',
+    borderRadius: 25,
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    color: '#ccc',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

@@ -9,7 +9,6 @@ import {
   View,
   Alert,
   Animated,
-  Modal,
 } from 'react-native';
 import { useAppContext } from '../AppContext';
 
@@ -33,13 +32,7 @@ const Form = () => {
   const [foodPrice, setFoodPrice] = React.useState('');
   const [transportCost, setTransportCost] = React.useState('');
   const [selectedOption, setSelectedOption] = React.useState('');
-  const [selectedOption1, setSelectedOption1] = React.useState('');
   const [budget, setBudget] = React.useState('');
-  const [showOutput, setShowOutput] = React.useState(false);
-  const [recommendedItems, setRecommendedItems] = React.useState<
-  { food: string; rating: number; price: number }[]>([]);
-  const [totalPrice, setTotalPrice] = React.useState(0);
-  const [totalRating, setTotalRating] = React.useState(0);
 
 
   //For handling event of food
@@ -125,73 +118,12 @@ const Form = () => {
     Alert.alert('Budget Entry', `Budget: ${budget}`);
   };
 
-  // Handle output button press
-  const handleOutputPress = () => {
-    if (foodDataList.length === 0 && transportList.length === 0 && budgetList.length === 0) {
-      Alert.alert('No Data', 'Please enter food, transport, and budget data before viewing output!');
-      return;
-    }
-
-    const budgetValue = budgetList[0].budget;
-    const transportValue = transportList[0].transportCost;
-    const availableBudget = budgetValue - transportValue;
-
-    if(availableBudget <= 0){
-      Alert.alert('Insufficient Budget', 'Transport cost is equal or exceeds the budget');
-      return;
-    }
-
-    const result = knapsack(foodDataList, availableBudget);
-    setRecommendedItems(result);
-
-    //compute for the totals
-    const totalPrice = result.reduce((sum, item) => sum + item.price, 0);
-    const totalRating = result.reduce((sum, item) => sum + item.rating, 0);
-    setTotalPrice(totalPrice);
-    setTotalRating(totalRating);
-
-    setShowOutput(true);
-  };
-
-  //Knapsack 0/1 Algorithm Dynamic Programming Approach
-  const knapsack = (items: { food: string; rating: number; price: number }[], capacity: number) => {
-    const n = items.length;
-    const dp = Array.from({ length: n + 1 }, () => Array(capacity + 1).fill(0));
-    
-    // Build DP table
-    for (let i = 1; i <= n; i++) {
-      const { rating, price } = items[i - 1];
-      for (let w = 0; w <= capacity; w++) {
-        if (price <= w) {
-          dp[i][w] = Math.max(rating + dp[i - 1][w - price], dp[i - 1][w]);
-        } else {
-          dp[i][w] = dp[i - 1][w];
-        }
-      }
-    }
-
-    // Backtrack to find selected items
-    let w = capacity;
-    const selected: typeof items = [];
-    for (let i = n; i > 0; i--) {
-      if (dp[i][w] !== dp[i - 1][w]) {
-        selected.push(items[i - 1]);
-        w -= items[i - 1].price;
-      }
-    }
-
-    return selected.reverse(); // Return in input order
-  };
-
   //Resize form when scrolling
   const scaleAnim = scrollY.interpolate({
     inputRange: [0, 150],
     outputRange: [1, 0.95], // Normal to slightly smaller
     extrapolate: 'clamp',
   });
-
-  //Knapsack Algorithm
-  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -280,58 +212,8 @@ const Form = () => {
             </TouchableOpacity>
           </Animated.View>
 
-          {/* Output button */}
-            <TouchableOpacity style={styles.outputButton} onPress={handleOutputPress}> 
-              <Text style={styles.buttonText}>OUTPUT</Text>
-            </TouchableOpacity>
-
         </View>
       </Animated.ScrollView>
-
-      {/* Modal for the Output */}
-      <Modal
-        animationType='slide'
-        transparent={true}
-        visible={showOutput}
-        onRequestClose={() => setShowOutput(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-
-            <ScrollView style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Recommended Purchases:</Text>
-
-              {recommendedItems.length === 0 ? (
-                <Text style={{ color: '#fff', textAlign: 'center' }}>No combination found.</Text>
-              ) : (
-                <>
-                  {recommendedItems.map((item, index) => (
-                    <Text key={index} style={{ color: '#fff', marginBottom: 10 }}>
-                      {item.food} - Rating: {item.rating}, Price: {item.price}
-                    </Text>
-                  ))}
-                  <View style={{ marginTop: 20 }}>
-                    <Text style={{ color: '#fff', fontWeight: 'bold', textAlign: 'center' }}>
-                      Total Price: {totalPrice}
-                    </Text>
-                    <Text style={{ color: '#fff', fontWeight: 'bold', textAlign: 'center' }}>
-                      Total Rating: {totalRating}
-                    </Text>
-                  </View>
-                </>
-              )}
-            </ScrollView>
-
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowOutput(false)}
-            >
-              <Text style={styles.buttonText}>Close</Text>
-            </TouchableOpacity>
-
-          </View>
-        </View>
-      </Modal>
 
     </SafeAreaView>
   );
@@ -437,41 +319,6 @@ const styles = StyleSheet.create({
   picker: {
     height: 50,
     width: '100%',
-  },
-
-  //Modal Styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    backgroundColor: '#216C53',
-    borderRadius: 25,
-    margin: 20,
-    maxHeight: '80%',
-    width: '90%',
-  },
-  modalContent: {
-    padding: 20,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  closeButton: {
-    backgroundColor: '#33866A',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 25,
-    alignSelf: 'center',
-    width: '50%',
-    alignItems: 'center',
-    margin: 20,
   },
 });
 
