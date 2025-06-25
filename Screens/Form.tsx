@@ -10,6 +10,8 @@ import {
   Alert,
   Animated,
 } from 'react-native';
+
+//importing the app context for the shared data list states
 import { useAppContext } from '../AppContext';
 
 import { Picker } from '@react-native-picker/picker';
@@ -102,10 +104,12 @@ const Form = () => {
       return;
     }
 
+    //To insert a new budget
     const newEntry = {
       budget: parseFloat(budget),
     };
 
+    //To update the budget
     setBudgetList(prevList => {
       const updatedList = [newEntry];
       console.log('Budget List:', updatedList);
@@ -115,6 +119,7 @@ const Form = () => {
     // Reset the input field
     setBudget('');
 
+    //To echo back the budget that the user entered
     Alert.alert('Budget Entry', `Budget: ${budget}`);
   };
 
@@ -137,7 +142,7 @@ const Form = () => {
         <View style={styles.innerContainer}>
           <Text style={styles.title}>cashia</Text>
 
-          {/* First input-button group in a container */}
+          {/* First input-button group in a container - Entering a budget */}
           <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }] }]}>
             <TextInput
               style={styles.input}
@@ -147,12 +152,14 @@ const Form = () => {
               onChangeText={setBudget}
               keyboardType="numeric"
             />
+
+            {/* submit button */}
             <TouchableOpacity style={styles.button} onPress={handleBudgetPress}>
               <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
           </Animated.View>
 
-          {/* Second input-button group in a container */}
+          {/* Second input-button group in a container - Entering Food choices */}
           <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }] }]}>
             <TextInput
               style={styles.input}
@@ -184,6 +191,7 @@ const Form = () => {
               </Picker>
             </View>
 
+            {/* Input Price of Food */}
             <TextInput
               style={styles.input}
               placeholder="Enter price"
@@ -192,12 +200,13 @@ const Form = () => {
               onChangeText={setFoodPrice}
             />
             
+            {/* Submit button for Food */}
             <TouchableOpacity style={styles.button} onPress={handleFoodPress}>
               <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
           </Animated.View>
 
-          {/* Third input-button group in a container */}
+          {/* Third input-button group in a container - To input transport cost*/}
           <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }] }]}>
             <TextInput
               style={styles.input}
@@ -207,6 +216,8 @@ const Form = () => {
               onChangeText={setTransportCost}
               keyboardType="numeric"
             />
+
+            {/* Submit button for transport cost */}
             <TouchableOpacity style={styles.button} onPress={handleTransportPress}>
               <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
@@ -219,6 +230,7 @@ const Form = () => {
   );
 };
 
+//For styling the components
 const styles = StyleSheet.create({
   container: {
     flex: 1,

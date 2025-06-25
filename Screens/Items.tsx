@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Modal } from 'react-native';
-import { useAppContext } from '../AppContext';
+import { useAppContext } from '../AppContext'; //For importing the data lists
 
 const Items = () => {
 
+  //To set the different states
   const [totalPrice, setTotalPrice] = React.useState(0);
   const [totalRating, setTotalRating] = React.useState(0);
   const [showOutput, setShowOutput] = React.useState(false);
@@ -25,9 +26,10 @@ const Items = () => {
   const transportCost = transportList[0]?.transportCost || 0;
   const availableBudget = budget - transportCost;
 
+  //Function for rendering the stars in the UI of the Items Screen
   const renderStars = (rating: number) => {
     const maxStars = 10;
-    const fullStars = Math.floor(rating);
+    const fullStars = rating;
     const stars = [];
     
     for (let i = 0; i < fullStars; i++) {
@@ -44,6 +46,7 @@ const Items = () => {
   const renderFoodItem = (item: { food: string; rating: number; price: number }, index: number) => (
     <View key={index} style={styles.foodItem}>
 
+      {/* Rendering each individual foods */}
       <View style={styles.foodInfo}>
         <Text style={styles.foodName}>{item.food}</Text>
         <View style={styles.ratingContainer}>
@@ -52,6 +55,7 @@ const Items = () => {
         </View>
       </View>
 
+      {/* For the remove (X) button */}
       <View style={styles.foodActions}>
         <Text style={styles.foodPrice}>₱{item.price}</Text>
         <TouchableOpacity 
@@ -79,6 +83,7 @@ const Items = () => {
           text: 'Remove',
           style: 'destructive',
           onPress: () => {
+            // creates a new array without the "removed" item and updates the state
             const updatedFoodList = foodDataList.filter((_, i) => i !== index);
             setFoodDataList(updatedFoodList);
           },
@@ -89,35 +94,45 @@ const Items = () => {
 
   // Handle output button press
     const handleOutputPress = () => {
+
+      //To check if each field has a data
       if (foodDataList.length === 0 && transportList.length === 0 && budgetList.length === 0) {
         Alert.alert('No Data', 'Please enter food, transport, and budget data before viewing output!');
         return;
       }
   
+      //Get the value from each list and compute the available budget for food
       const budgetValue = budgetList[0].budget;
       const transportValue = transportList[0].transportCost;
       const availableBudget = budgetValue - transportValue;
   
+      //validation if budget is more than zero
       if(availableBudget <= 0){
         Alert.alert('Insufficient Budget', 'Transport cost is equal or exceeds the budget');
         return;
       }
   
+      //Calls the knapsack algorithm on the foodlist with the budget constraint
       const result = knapsack(foodDataList, availableBudget);
-      setRecommendedItems(result);
+      setRecommendedItems(result);//set the result of knapsack algorithm and update the state
   
-      //compute for the totals
+      //compute for the totals and update the states
       const totalPrice = result.reduce((sum, item) => sum + item.price, 0);
       const totalRating = result.reduce((sum, item) => sum + item.rating, 0);
       setTotalPrice(totalPrice);
       setTotalRating(totalRating);
   
+      //For the modal component
       setShowOutput(true);
     };
   
     //Knapsack 0/1 Algorithm Dynamic Programming Approach
     const knapsack = (items: { food: string; rating: number; price: number }[], capacity: number) => {
-      const n = items.length;
+
+      //To get the size of the array
+      const n = items.length; 
+
+      //To create a 2d array with size of n + 1 by capacity + 1 since the table starts with zero
       const dp = Array.from({ length: n + 1 }, () => Array(capacity + 1).fill(0));
       
       // Build DP table
@@ -155,18 +170,25 @@ const Items = () => {
       {/* Budget Overview */}
       <View style={styles.budgetSection}>
         <View style={styles.budgetCard}>
+
+          {/* Shows the budget the user entered */}
           <View style={styles.budgetRow}>
             <Text style={styles.budgetLabel}>Budget:</Text>
             <Text style={styles.budgetAmount}>₱{budget.toFixed(2)}</Text>
           </View>
+
+          {/* Shows the transport cost the user entered */}
           <View style={styles.budgetRow}>
             <Text style={styles.budgetLabel}>Transport Cost:</Text>
             <Text style={styles.expenseAmount}>₱{transportCost.toFixed(2)}</Text>
           </View>
+
+          {/* Shows the available budget for food */}
           <View style={styles.budgetRow}>
             <Text style={styles.budgetLabel}>Budget Available for Food:</Text>
             <Text style={styles.availableAmount}>₱{availableBudget.toFixed(2)}</Text>
           </View>
+
         </View>
       </View>
 
@@ -190,7 +212,7 @@ const Items = () => {
                       text: 'Clear All',
                       style: 'destructive',
                       onPress: () => {
-                        setFoodDataList([]);
+                        setFoodDataList([]);//resets the food data list empty
                       },
                     },
                   ]
@@ -202,6 +224,7 @@ const Items = () => {
           )}
         </View>
         
+        {/* Show this message if no food items entered */}
         {foodDataList.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>No food items added yet</Text>
@@ -211,6 +234,7 @@ const Items = () => {
             {foodDataList.map(renderFoodItem)}
           </View>
         )}
+
       </View>
 
       {/* Output button */}
@@ -231,6 +255,7 @@ const Items = () => {
             <ScrollView style={styles.modalContent}>
               <Text style={styles.modalTitle}>Recommended Purchases:</Text>
 
+              {/* The output for recommended items */}
               {recommendedItems.length === 0 ? (
                 <Text style={{ color: '#fff', textAlign: 'center' }}>No combination found.</Text>
               ) : (
@@ -250,8 +275,10 @@ const Items = () => {
                   </View>
                 </>
               )}
-            </ScrollView>
 
+            </ScrollView>
+              
+            {/* Button to close the output popup */}
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setShowOutput(false)}
@@ -267,6 +294,7 @@ const Items = () => {
   );
 };
 
+//For styling the components
 const styles = StyleSheet.create({
   container: {
     flex: 1,
