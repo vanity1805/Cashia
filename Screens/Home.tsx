@@ -107,11 +107,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontFamily: 'Cocogoose-Pro-Bold-trial', // Custom font
+    fontSize: 30,
     color: '#216C53',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 1,
   },
   subtitle: {
     fontSize: 18,

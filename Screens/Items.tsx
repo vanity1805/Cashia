@@ -307,11 +307,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontFamily: 'Cocogoose-Pro-Bold-trial', // Custom font
+    fontSize: 30,
     color: '#216C53',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 1,
   },
   subtitle: {
     fontSize: 18,
@@ -352,12 +352,12 @@ const styles = StyleSheet.create({
   budgetAmount: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: '#65C466',
   },
   expenseAmount: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#ff6b6b',
+    color: '#EB4D3D',
   },
   availableAmount: {
     fontSize: 16,
